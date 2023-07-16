@@ -1,11 +1,25 @@
+using MandezcaTest.Database;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("MyPolicy",
+                      policy =>
+                      {
+                          policy.AllowAnyOrigin()
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                      });
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+AddDBContext(builder);
 
 var app = builder.Build();
 
@@ -17,11 +31,18 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors("MyPolicy");
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
 
-
+void AddDBContext(WebApplicationBuilder builder)
+{
+    string connectionString = builder.Configuration.GetConnectionString("MyDatabaseConnection");
+    builder.Services.AddDbContext<DataBaseContext>(options => {
+        options.UseSqlServer(connectionString);
+    });
+    builder.Services.AddScoped<DbContext, DataBaseContext>();
+}
