@@ -21,24 +21,24 @@ namespace MandezcaTest.Controllers.ClientController
 
             if (client == null)
             {
-                return NotFound(); // Retorna código 404 si el cliente no existe
+                return NotFound();
             }
 
-            // Elimina los registros de la tabla "Perfil" asociados al cliente
+            // Primero Elimina los registros de la tabla Perfil asociados al cliente
             var perfils = dbContext.Perfil.Where(p => p.ClientId == clientId).ToList();
             dbContext.Perfil.RemoveRange(perfils);
 
-            // Elimina los registros de la tabla "Address" asociados al cliente
+            // Los registros de la tabla Address asociados al cliente
             var addresses = dbContext.Address.Where(a => a.ClientId == clientId).ToList();
             dbContext.Address.RemoveRange(addresses);
 
-            // Elimina el cliente de la tabla "Client"
+            // Elimina Client
             dbContext.Client.Remove(client);
 
-            // Guarda los cambios en la base de datos
             dbContext.SaveChanges();
 
-            return NoContent(); // Retorna código 204 para indicar que la eliminación fue exitosa
+            //204
+            return NoContent();
         }
     }
 }
